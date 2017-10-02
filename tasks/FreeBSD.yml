@@ -1,0 +1,21 @@
+---
+- name: install samba
+  pkgng:
+    name: samba46
+    state: present
+  tags: samba, pkg
+
+- name: installe smbldap-tools
+  pkgng:
+    name: smbldap-tools
+    state: present
+  tags: samba, pkg
+  when: smb_is_pdc == True
+
+- name: enable winbind
+  lineinfile:
+    dest: /etc/rc.conf
+    line: 'winbindd_enable="YES"'
+    regexp: '^winbindd_enable'
+    state: present
+  tags: samba, rc

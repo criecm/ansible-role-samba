@@ -1,0 +1,24 @@
+galaxy_info:
+  author: Geoffroy Desvernay
+  description: Samba server
+  company: Ecole Centrale Marseille
+
+  min_ansible_version: 2.3
+
+platforms:
+  - name: Debian
+    versions:
+    - stretch
+    - jessie
+  - name: FreeBSD
+    versions:
+    - 11.0
+    - 10.3
+
+  galaxy_tags:
+    - cifs
+    - samba
+    - openldap
+
+dependencies:
+  - criecm.ldap_client

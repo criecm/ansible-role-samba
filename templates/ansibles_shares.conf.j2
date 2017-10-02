@@ -1,0 +1,7 @@
+{% for share in shares %}
+[{{ share.name }}]
+{%   for e,v in share %}
+{% if e != "name" %}
+{{ e | regex_replace("_"," ") }} = {{ v }}
+{% endif %}
+{% endfor %}

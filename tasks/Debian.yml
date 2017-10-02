@@ -1,0 +1,13 @@
+---
+- name: install samba
+  apt:
+    name: samba
+    state: present
+  tags: samba,pkg
+
+- name: installe smbldap-tools
+  apt:
+    name: smbldap-tools
+    state: present
+  tags: samba, pkg
+  when: smb_is_pdc == True

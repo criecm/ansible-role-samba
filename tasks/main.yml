@@ -1,0 +1,73 @@
+---
+# tasks file for criecm.samba
+- include_vars: '{{ includefile }}'
+  with_first_found:
+    - files:
+        - '{{ ansible_os_family }}.yml'
+      skip: True
+  loop_control:
+    loop_var: includefile
+  tags: samba, vars
+
+- include: '{{ includefile }}'
+  with_first_found:
+    - files:
+        - '{{ ansible_os_family }}.yml'
+      skip: True
+  loop_control:
+    loop_var: includefile
+  tags: samba, config
+
+- block:
+  - name: smb.conf
+    template:
+      src: smb.conf.j2
+      dest: '{{ smbconf_path }}'
+      mode: '0640'
+      validate: 'testparm -s %s'
+      backup: yes
+    tags: samba, config
+    register: newconf
+    notify: reload samba
+  - name: mkdir smb.conf.d
+    file:
+      dest: '{{ smbconf_path }}.d'
+      state: directory
+  - name: ansibles_shares.conf
+    template:
+      src: ansibles_shares.conf.j2
+      dest: '{{ smbconf_path }}.d/ansibles_shares.conf'
+  - name: save ldap passwd
+    shell: 'net idmap set secret {{ smb_domain }} {{ smb_ldap_readpw | default(smb_ldap_adminpw) }}'
+    when: newconf.changed and smb_domain != "" and smb_ldap_adminpw != ""
+    tags: samba, config
+  - name: save ldap adminpw
+    shell: 'smbpasswd -w {{ smb_ldap_adminpw }}'
+    when: smb_is_dc and newconf.changed and smb_ldap_adminpw != ""
+    tags: samba, config
+
+- block:
+  - name: config smbldap-tools
+    template:
+      src: smbldap.conf.j2
+      dest: '{{ smbldap_conf_dir }}/smbldap.conf'
+  - name: privconf smbldap-tools
+    template:
+      src: smbldap_bind.conf.j2
+      dest: '{{ smbldap_conf_dir }}/smbldap_bind.conf'
+      mode: '0600'
+  when: smb_is_pdc == True
+    
+- name: join domain
+  command: 'net rpc join -U {{ samba_join_user }}%{{ samba_join_passwd }}'
+  when: samba_join_user != ""
+  tags: samba, config
+
+- name: enable services
+  service:
+    name: '{{ service }}'
+    enabled: yes
+  with_items: '{{ samba_service_names }}'
+  loop_control:
+    loop_var: service
+  tags: samba, config

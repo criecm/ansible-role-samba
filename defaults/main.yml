@@ -1,0 +1,66 @@
+---
+# defaults file for criecm.samba
+smb_domain:
+
+smb_ips: []
+smb_allow:
+
+# 'cups'
+smb_printing:
+
+#smb_server_role: 'CLASSIC PRIMARY DOMAIN CONTROLLER'
+#smb_server_role: 'ROLE_DOMAIN_BDC'
+smb_server_role: 'ROLE_DOMAIN_MEMBER'
+
+# user to join domain
+samba_join_user:
+samba_join_passwd:
+
+smb_master: False
+smb_is_dc: False
+smb_is_pdc: False
+
+# logon script for dc
+smb_logon_script:
+smb_logon_path:
+
+smb_netlogon_dir: /home/samba/netlogon
+
+smb_dc_logon_script:
+smb_dc_logon_path:
+
+smb_os_level:
+
+smb_logging: 'syslog@2'
+# man smb.conf
+smb_log_level: '1 auth:2'
+
+smb_unix_charset: utf8
+smb_dos_charset: cp850
+
+#smb_params:
+#  unix_charset: '{{ smb_unix_charset }}'
+
+# if smb_ldap_uri not empty, use ldap (to be defined in eg. "SMBDC" group)
+smb_ldap_uri:
+smb_ldap_admindn:
+smb_ldap_adminpw:
+smb_ldap_suffix:
+smb_ldap_group_suffix: 'dc=Group'
+smb_ldap_user_suffix: 'ou=People'
+smb_ldap_machine_suffix: 'ou=Machines'
+smb_ldap_idmap_suffix:
+smb_ldap_replication_sleep: 2000
+smb_ldap_ssl: 'off'
+smb_ldap_passwd_sync: 'Yes'
+
+smb_ldapsam_trusted: True
+smb_ldapsam_editposix: True
+
+# if !is_wins, use smb_wins_server
+smb_is_wins: False
+
+smb_wins_server:
+
+# define shares
+smb_shares: {}

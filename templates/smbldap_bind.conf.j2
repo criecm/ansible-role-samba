@@ -1,0 +1,4 @@
+slaveDN="{{ smb_ldap_readdn | default(smb_ldap_admindn) }}"
+slavePw="{{ smb_ldap_readpw | default(smb_ldap_adminpw) }}"
+masterDN="{{ smb_ldap_admindn }}"
+masterPw="{{ smb_ldap_adminpw }}"

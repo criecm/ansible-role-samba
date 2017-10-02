@@ -1,0 +1,19 @@
+---
+# handlers file for criecm.samba
+- name: restart samba
+  service: 
+    name: '{{ samba_service_name }}'
+    state: restarted
+  with_items: '{{ samba_service_names }}'
+  loop_control:
+    loop_var: samba_service_name
+
+- name: reload samba
+  service:
+    name: '{{ samba_service_name }}'
+    state: reloaded
+  with_items: '{{ samba_reload_names }}'
+  loop_control:
+    loop_var: samba_service_name
+
+

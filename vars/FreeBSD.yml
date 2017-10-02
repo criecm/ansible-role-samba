@@ -1,0 +1,5 @@
+---
+smbconf_path: /usr/local/etc/smb4.conf
+samba_reload_names: [ samba_server ]
+samba_service_names: [ samba_server ]
+smbldap_conf_dir: /usr/local/etc/smbldap-tools
