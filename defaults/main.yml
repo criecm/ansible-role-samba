@@ -38,8 +38,11 @@ smb_log_level: '1 auth:2'
 smb_unix_charset: utf8
 smb_dos_charset: cp850
 
-#smb_params:
-#  unix_charset: '{{ smb_unix_charset }}'
+# [global] additionnal parameters
+smb_global_params: {}
+# eg:
+#  unix charset: '{{ smb_unix_charset }}'
+#  map archive: 'No'
 
 # if smb_ldap_uri not empty, use ldap (to be defined in eg. "SMBDC" group)
 smb_ldap_uri:
@@ -64,3 +67,4 @@ smb_wins_server:
 
 # define shares
 smb_shares: {}
+

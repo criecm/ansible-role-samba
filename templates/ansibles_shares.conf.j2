@@ -1,7 +1,11 @@
-{% for share in shares %}
+# {{ ansible_managed }}
+
+{% for share in smb_shares %}
 [{{ share.name }}]
-{%   for e,v in share %}
-{% if e != "name" %}
+{%   for e,v in share.iteritems() %}
+{%     if e != "name" %}
 {{ e | regex_replace("_"," ") }} = {{ v }}
-{% endif %}
+{%     endif %}
+{%   endfor %}
+
 {% endfor %}

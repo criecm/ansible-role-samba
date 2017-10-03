@@ -1,4 +1,7 @@
-# ansible-managed
+# {{ ansible_managed }}
+#
+# Ce fichier est genere par ansible. Utilisez smb4.conf.d/local.conf
+# pour des changements locaux
 [global]
   client use spnego = no
 
@@ -30,86 +33,81 @@
 # Put a capping on the size of the log files (in Kb).
   max log size = 50
 
-# The argument list may include:
-#   password server = My_PDC_Name [My_BDC_Name] [My_Next_BDC_Name]
-# or to auto-locate the domain controller/s
-#   password server = *
-#   password server = NFS
-
 # Backend to store user information in. New installations should 
 # use either tdbsam or ldapsam. smbpasswd is available for backwards 
 # compatibility. tdbsam requires no further configuration.
 ;   passdb backend = tdbsam
 
-	idmap config *: backend = tdb
-	idmap config *: range = 100000-200000
+  idmap config *: backend = tdb
+  idmap config *: range = 100000-200000
 
-{% if smb_ldap_uri %}
-	ldap admin dn = {{ smb_ldap_admindn }}
-	ldap group suffix = {{ smb_ldap_group_suffix }}
-	ldap idmap suffix = {{ smb_ldap_suffix }}
-	ldap machine suffix = {{ smb_ldap_machine_suffix }}
-	ldap passwd sync = {{ smb_ldap_passwd_sync }}
-	ldap suffix = {{ smb_ldap_suffix }}
-	ldap user suffix = {{ smb_ldap_user_suffix }}
-	ldap ssl = No
+{% if smb_ldap_uri and ( smb_is_dc or smb_is_pdc ) %}
+  # DC
+  ldap admin dn = {{ smb_ldap_admindn }}
+  ldap group suffix = {{ smb_ldap_group_suffix }}
+  ldap idmap suffix = {{ smb_ldap_suffix }}
+  ldap machine suffix = {{ smb_ldap_machine_suffix }}
+  ldap passwd sync = {{ smb_ldap_passwd_sync }}
+  ldap suffix = {{ smb_ldap_suffix }}
+  ldap user suffix = {{ smb_ldap_user_suffix }}
+  ldap ssl = No
 
-{% if smb_is_dc or smb_is_pcd %}
-	passdb expand explicit = no
+{% if smb_is_dc or smb_is_pdc and smb_ldap_uri %}
+  passdb expand explicit = no
 
-	passdb backend = ldapsam:"{{ smb_ldap_uri }}"
-	#passdb backend = ldapsam:"ldap://192.168.104.2"
+  passdb backend = ldapsam:"{{ smb_ldap_uri }}"
 
-	{% if smb_ldapsam_trusted %}
-	ldapsam:trusted=yes
-	{% if smb_ldapsam_editposix %}
-	ldapsam:editposix=yes
-	{% endif %}
-	{% endif %}
+  {% if smb_ldapsam_trusted %}
+  ldapsam:trusted=yes
+  {% if smb_ldapsam_editposix %}
+  ldapsam:editposix=yes
+  {% endif %}
+  {% endif %}
 
-	idmap config {{ smb_domain }}: backend = LDAP
-	idmap config {{ smb_domain }}: read only = yes
-	idmap config {{ smb_domain }}: ldap_user_dn = {{ smb_ldap_readdn | default(smb_ldap_admindn) }}
-	idmap config {{ smb_domain }}: ldap_base_dn = {{ smb_ldap_suffix }}
-	idmap config {{ smb_domain }}: ldap_url = {{ smb_ldapr_uri | default(smb_ldap_uri) }}
-	idmap config {{ smb_domain }}: range = 10000-50000
+  idmap config {{ smb_domain }}: backend = LDAP
+  idmap config {{ smb_domain }}: read only = yes
+  idmap config {{ smb_domain }}: ldap_user_dn = {{ smb_ldap_readdn | default(smb_ldap_admindn) }}
+  idmap config {{ smb_domain }}: ldap_base_dn = {{ smb_ldap_suffix }}
+  idmap config {{ smb_domain }}: ldap_url = {{ smb_ldapr_uri | default(smb_ldap_uri) }}
+  idmap config {{ smb_domain }}: range = 10000-50000
 {% endif %}
 {% endif %}
 
-{% if smb_is_dc or smb_is_pcd %}
-	domain logons = Yes
+{% if smb_is_dc or smb_is_pdc %}
+  domain logons = Yes
 {% endif %}
 
 {% if smb_master %}
-	domain master = yes
-	preferred master = Yes
-	local master = yes
+  domain master = yes
+  preferred master = Yes
+  local master = yes
 {% endif %}
 
-#	log level = 2 sam:5 idmap:10
-#	log level = 2 sam:5 passdb:5 idmap:5
-#	log level = 5 auth:5 passdb:10
+#  log level = 2 sam:5 idmap:10
+#  log level = 2 sam:5 passdb:5 idmap:5
+#  log level = 5 auth:5 passdb:10
 {% if smb_log_level %}
-	log level = {{ smb_log_level }}
+  log level = {{ smb_log_level }}
 {% endif %}
 
-# Most people will find that this option gives better performance.
 # See the chapter 'Samba performance issues' in the Samba HOWTO Collection
 # and the manual pages for details.
 # You may want to add the following on a Linux system:
 #         SO_RCVBUF=8192 SO_SNDBUF=8192
-   socket options = TCP_NODELAY
+{% if ansible_system == "Linux" %}
+  socket options = TCP_NODELAY SO_RCVBUF=8192 SO_SNDBUF=8192
+{% else %}
+  socket options = TCP_NODELAY
+{% endif %}
 
 # OS Level determines the precedence of this server in master browser
 # elections. The default value should be reasonable
-;   os level = 33
 {% if smb_os_level %}
-os level ={{ smb_os_level }}
+  os level ={{ smb_os_level }}
 {% endif %}
 
 # Windows Internet Name Serving Support Section:
 # WINS Support - Tells the NMBD component of Samba to enable it's WINS Server
-#SMB4WINS   wins support = no
 {% if smb_is_wins %}
   wins support = yes
 {% elif smb_wins_server %}
@@ -124,30 +122,18 @@ lm announce = no
    unix charset = {{ smb_unix_charset }}
    dos charset = {{ smb_dos_charset }}
 
-# Use extended attributes to store file modes
-;    store dos attributes = yes
-;    map hidden = no
-;    map system = no
-;    map archive = no
+{% for n,v in smb_global_params.iteritems() %}
+{{ n }} = {{ v }}
+{% endfor %}
 
-# Use inherited ACLs for directories
-;    nt acl support = yes
-;    inherit acls = yes
-;    map acl inherit = yes 
-
-# # These scripts are used on a domain controller or stand-alone 
-# # machine to add or delete corresponding unix accounts
-# #  add machine script = /usr/local/sbin/smbldap-useradd -w "%u"
-; add machine script = /usr/local/bin/ldapaddmachine '%u' 515
-# delete user script = /usr/local/bin/ldapdeleteuser '%u'
-# add user to group script = /usr/local/bin/ldapaddusertogroup '%u' '%g'
-# delete user from group script = /usr/local/bin/ldapdeleteuserfromgroup '%u' '%g'
-# ;  add user script = /usr/sbin/useradd %u
-# ;  add group script = /usr/sbin/groupadd %g
-# ;  add machine script = /usr/sbin/adduser -n -g machines -c Machine -d /dev/null -s /bin/false %u
-# ;  delete user script = /usr/sbin/userdel %u
-# ;  delete user from group script = /usr/sbin/deluser %u %g
-# ;  delete group script = /usr/sbin/groupdel %g
+{% if smb_is_pdc %}
+# used to add unix machine account
+{% if smb_ldap_uri %}
+  add machine script = /usr/local/sbin/smbldap-useradd -w "%u"
+{% else %}
+  add machine script = /usr/sbin/adduser -n -g machines -c Machine -d /dev/null -s /bin/false %u
+{% endif %}
+{% endif %}
 
 include = {{ smbconf_path }}.d/local.conf
 include = {{ smbconf_path }}.d/ansible_shares.conf

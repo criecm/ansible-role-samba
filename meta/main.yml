@@ -1,3 +1,4 @@
+---
 galaxy_info:
   author: Geoffroy Desvernay
   description: Samba server
@@ -5,15 +6,15 @@ galaxy_info:
 
   min_ansible_version: 2.3
 
-platforms:
-  - name: Debian
-    versions:
-    - stretch
-    - jessie
-  - name: FreeBSD
-    versions:
-    - 11.0
-    - 10.3
+  platforms:
+    - name: Debian
+      versions:
+      - stretch
+      - jessie
+    - name: FreeBSD
+      versions:
+      - 11.0
+      - 10.3
 
   galaxy_tags:
     - cifs

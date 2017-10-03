@@ -27,6 +27,12 @@ read: `variable_name` (default value) details
 * `smb_ldap_adminpw` ()
 
 ### optional
+* `smb_global_params` ({}) dict of samba parameters
+```
+smb_global_params:
+  unix charset: 'utf8'
+  map archive: 'No'
+```
 * `smb_ldap_readdn` (`smb_ldap_admindn`) read-only ldap user
 * `smb_ldap_readpw` (`smb_ldap_adminpw`) and his passwd
 * `smb_ldapr_uri` (`smb_ldap_uri`) LDAP replica if any
