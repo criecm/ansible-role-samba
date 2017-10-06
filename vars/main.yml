@@ -1,3 +1,6 @@
 ---
 # vars file for criecm.samba
 samba_service_names: [ smbd nmbd ]
+
+# set smb_is_dc if smb_is_pdc
+is_dc: '{% if smb_is_pdc or smb_is_dc %}True{% else %}False{% endif %}'

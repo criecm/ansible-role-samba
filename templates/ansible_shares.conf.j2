@@ -1,6 +1,6 @@
 # {{ ansible_managed }}
 
-{% for share in smb_shares %}
+{% for share in smb_group_shares | union(smb_shares) %}
 [{{ share.name }}]
 {%   for e,v in share.iteritems() %}
 {%     if e != "name" %}

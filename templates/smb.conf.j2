@@ -4,19 +4,16 @@
 # pour des changements locaux
 [global]
   client use spnego = no
-
   workgroup = {{ smb_domain }}
-
   server string = {{ ansible_hostname }}
-
-{% if smb_is_dc or smb_is_pdc or smb_domain == "" %}
+{% if is_dc or smb_domain == "" %}
   security = user
 {% else %}
   security = domain
 {% endif %}
 
 {% if smb_ips %}
-  interfaces = {% for ip in smb_ips %}{{ ip }}{% endfor %} 127.0.0.1
+  interfaces ={% for ip in smb_ips %} {{ ip }}{% endfor %} 127.0.0.1
   bind interfaces only = yes
 {% endif %}
 {% if smb_allow %}
@@ -28,6 +25,7 @@
   printing = {{ smb_printing }}
 {% else %}
   load printers = NO
+  printcap name = /dev/null
 {% endif %}
 
 # Put a capping on the size of the log files (in Kb).
@@ -39,9 +37,9 @@
 ;   passdb backend = tdbsam
 
   idmap config *: backend = tdb
-  idmap config *: range = 100000-200000
+  idmap config *: range = 10000-200000
 
-{% if smb_ldap_uri and ( smb_is_dc or smb_is_pdc ) %}
+{% if smb_ldap_uri and is_dc %}
   # DC
   ldap admin dn = {{ smb_ldap_admindn }}
   ldap group suffix = {{ smb_ldap_group_suffix }}
@@ -52,7 +50,7 @@
   ldap user suffix = {{ smb_ldap_user_suffix }}
   ldap ssl = No
 
-{% if smb_is_dc or smb_is_pdc and smb_ldap_uri %}
+{% if is_dc and smb_ldap_uri %}
   passdb expand explicit = no
 
   passdb backend = ldapsam:"{{ smb_ldap_uri }}"
@@ -73,7 +71,7 @@
 {% endif %}
 {% endif %}
 
-{% if smb_is_dc or smb_is_pdc %}
+{% if is_dc %}
   domain logons = Yes
 {% endif %}
 

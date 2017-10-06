@@ -10,7 +10,7 @@
     name: smbldap-tools
     state: present
   tags: samba, pkg
-  when: smb_is_pdc or smb_is_dc
+  when: is_dc
 
 - name: enable winbind
   lineinfile:
@@ -19,5 +19,5 @@
     regexp: '^winbindd_enable'
     state: present
   tags: samba, rc
-  when: smb_is_pdc or smb_is_dc
+  when: is_dc
 
