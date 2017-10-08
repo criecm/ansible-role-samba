@@ -4,6 +4,8 @@ galaxy_info:
   description: Samba server
   company: Ecole Centrale Marseille
 
+  license: BSD
+
   min_ansible_version: 2.3
 
   platforms:
