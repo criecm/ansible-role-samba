@@ -28,20 +28,15 @@
   printcap name = /dev/null
 {% endif %}
 
-# Put a capping on the size of the log files (in Kb).
+  # Put a capping on the size of the log files (in Kb).
   max log size = 50
 
-# Backend to store user information in. New installations should 
-# use either tdbsam or ldapsam. smbpasswd is available for backwards 
-# compatibility. tdbsam requires no further configuration.
-;   passdb backend = tdbsam
-
   idmap config *: backend = tdb
-  idmap config *: range = 10000-200000
+  idmap config *: range = 100000-200000
 
-{% if smb_ldap_uri and is_dc %}
-  # DC
-  ldap admin dn = {{ smb_ldap_admindn }}
+{% if is_dc %}
+{% if smb_ldap_uri %}
+  ldap admin dn = {{ smb_ldap_readdn | default(smb_ldap_admindn) }}
   ldap group suffix = {{ smb_ldap_group_suffix }}
   ldap idmap suffix = {{ smb_ldap_suffix }}
   ldap machine suffix = {{ smb_ldap_machine_suffix }}
@@ -50,7 +45,13 @@
   ldap user suffix = {{ smb_ldap_user_suffix }}
   ldap ssl = No
 
-{% if is_dc and smb_ldap_uri %}
+  idmap config {{ smb_domain }}: backend = LDAP
+  idmap config {{ smb_domain }}: read only = yes
+  idmap config {{ smb_domain }}: ldap_user_dn = {{ smb_ldap_readdn | default(smb_ldap_admindn) }}
+  idmap config {{ smb_domain }}: ldap_base_dn = {{ smb_ldap_suffix }}
+  idmap config {{ smb_domain }}: ldap_url = {{ smb_ldapr_uri | default(smb_ldap_uri) }}
+  idmap config {{ smb_domain }}: range = 10000-99999
+
   passdb expand explicit = no
 
   passdb backend = ldapsam:"{{ smb_ldap_uri }}"
@@ -62,17 +63,13 @@
   {% endif %}
   {% endif %}
 
-  idmap config {{ smb_domain }}: backend = LDAP
-  idmap config {{ smb_domain }}: read only = yes
-  idmap config {{ smb_domain }}: ldap_user_dn = {{ smb_ldap_readdn | default(smb_ldap_admindn) }}
-  idmap config {{ smb_domain }}: ldap_base_dn = {{ smb_ldap_suffix }}
-  idmap config {{ smb_domain }}: ldap_url = {{ smb_ldapr_uri | default(smb_ldap_uri) }}
-  idmap config {{ smb_domain }}: range = 10000-50000
 {% endif %}
-{% endif %}
-
-{% if is_dc %}
   domain logons = Yes
+{% else %}
+  idmap config {{ ansible_hostname }}: backend = nss
+  idmap config {{ ansible_hostname }}: range = 5000-9999
+  idmap config {{ smb_domain }}: backend = nss
+  idmap config {{ smb_domain }}: range = 10000-99999
 {% endif %}
 
 {% if smb_master %}
