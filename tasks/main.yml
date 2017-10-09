@@ -39,12 +39,21 @@
   template:
     src: ansible_shares.conf.j2
     dest: '{{ smbconf_path }}.d/ansible_shares.conf'
-  tags: samba, config
+  tags: samba, shares, config
   notify: reload samba
+
+- name: mkdir & co
+  include: share.yml
+  with_items:
+    - '{{ shares }}'
+    - '{{ group_shares }}'
+  loop_control:
+    loop_var: share
+  tags: samba,shares
 
 - name: save ldap passwd
   shell: 'net idmap set secret {{ smb_domain }} {{ smb_ldap_readpw | default(smb_ldap_adminpw) }}'
-  when: newconf.changed and smb_domain != "" and smb_ldap_adminpw != "" and is_dc
+  when: newconf.changed and smb_domain != "" and ( smb_ldap_adminpw != "" or smb_ldap_readpw != "" )
   tags: samba, config
 
 - name: save ldap adminpw

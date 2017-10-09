@@ -67,8 +67,12 @@ Example Playbook
       roles:
         - { role: criecm.samba }
       vars:
-        smb_shares:
-          - {name:"netlogon",path:"/shares/netlogon",comment: "Netlogon service",root_preexec: "/my/script/mknetlogon %U %G %I"}
+        shares:
+          - name: "netlogon"
+            path: "/shares/netlogon"
+            smbparms:
+              comment: "Netlogon service"
+              root preexec: "/my/script/mknetlogon %U %G %I"
         smb_domain: "MYDOM"
         smb_join_user: "automachines"
         smb_join_passwd: "his pass"
@@ -82,8 +86,20 @@ Example Playbook
       roles:
         - { role: criecm.samba }
       vars:
-        smb_shares:
-          - {name:"myshare",path:"/shares/t",guest_ok:"no",valid_users:"me,him,her,us"}
+        shares:
+          - name: "myshare"
+            path: "/shares/t"
+            smbparms:
+              guest ok: "no"
+              valid users: "me,him,her,us"
+          - name: Profiles
+            path: /shares/p
+            smbparms:
+              browseable: "No"
+              csc policy: "disable"
+              root preexec: "'/bin/sh /root/mkprofile.sh %u %g'"
+              profile acls: "Yes"
+              read only: "No"
         smb_domain: "MYDOM"
         smb_join_user: "automachines"
         smb_join_passwd: "his pass"

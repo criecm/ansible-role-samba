@@ -66,6 +66,6 @@ smb_is_wins: False
 smb_wins_server:
 
 # define shares
-smb_shares: []
+shares: []
 # define shares for group
-smb_group_shares: []
+group_shares: []
