@@ -3,7 +3,8 @@
 # Ce fichier est genere par ansible. Utilisez smb4.conf.d/local.conf
 # pour des changements locaux
 [global]
-  client use spnego = no
+#  client use spnego = no
+#  client ipc signing = auto
   workgroup = {{ smb_domain }}
   server string = {{ ansible_hostname }}
 {% if is_dc or smb_domain == "" %}
