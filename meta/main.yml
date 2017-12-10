@@ -6,16 +6,15 @@ galaxy_info:
 
   license: BSD
 
-  min_ansible_version: 2.3
+  min_ansible_version: 2.4
 
   platforms:
     - name: Debian
       versions:
       - stretch
-      - jessie
     - name: FreeBSD
       versions:
-      - 11.0
+      - 11.1
       - 10.3
 
   galaxy_tags:
