@@ -9,7 +9,7 @@
     loop_var: includefile
   tags: samba, vars
 
-- include: '{{ includefile }}'
+- include_tasks: '{{ includefile }}'
   with_first_found:
     - files:
         - '{{ ansible_os_family }}.yml'
@@ -43,7 +43,7 @@
   notify: reload samba
 
 - name: mkdir & co
-  include: share.yml
+  include_tasks: share.yml
   with_items:
     - '{{ shares }}'
     - '{{ group_shares }}'
