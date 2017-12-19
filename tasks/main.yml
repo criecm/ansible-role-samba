@@ -53,7 +53,7 @@
 
 - name: save ldap passwd
   shell: 'net idmap set secret {{ smb_domain }} {{ smb_ldap_readpw | default(smb_ldap_adminpw) }}'
-  when: newconf.changed and smb_domain != "" and ( smb_ldap_adminpw != "" or smb_ldap_readpw != "" )
+  when: newconf.changed and smb_domain != "" and ( smb_ldap_adminpw != "" or smb_ldap_readpw != "" ) and is_dc
   tags: samba, config
 
 - name: save ldap adminpw
