@@ -49,6 +49,7 @@
     - '{{ group_shares }}'
   loop_control:
     loop_var: share
+  when: '"cifs" in share and share.cifs'
   tags: samba,shares
 
 - name: save ldap passwd

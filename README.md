@@ -70,6 +70,7 @@ Example Playbook
         shares:
           - name: "netlogon"
             path: "/shares/netlogon"
+            cifs: True
             smbparms:
               comment: "Netlogon service"
               root preexec: "/my/script/mknetlogon %U %G %I"
@@ -89,11 +90,13 @@ Example Playbook
         shares:
           - name: "myshare"
             path: "/shares/t"
+            cifs: True
             smbparms:
               guest ok: "no"
               valid users: "me,him,her,us"
           - name: Profiles
             path: /shares/p
+            cifs: True
             smbparms:
               browseable: "No"
               csc policy: "disable"
