@@ -29,6 +29,10 @@
   printcap name = /dev/null
 {% endif %}
 
+  aio read size = 16384
+  aio write size = 16384
+  use sendfile = Yes
+
   # Put a capping on the size of the log files (in Kb).
   max log size = 50
 
