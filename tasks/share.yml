@@ -1,8 +1,5 @@
 ---
-- debug:
-    var: share
-
-- name: test share.path
+- name: 'test {{ share.path }} existence'
   stat:
     path: '{{ share.path }}'
   register: path_stat
@@ -10,14 +7,6 @@
 # create
 - block:
   # need mkdir
-  - name: zfs create
-    zfs:
-      name: '{{ share.zfsrc }}'
-      state: present
-      mountpoint: '{{ share.path }}'
-      aclmode: passthrough
-      aclinherit: passthrough
-    when: '"zfsrc" in share'
   - name: mkdir
     file:
       path: '{{ share.path }}'

@@ -7,6 +7,8 @@ Install / configure samba standalone or in a NT4-style domain
 Requirements
 ------------
 ldap nss client installed (eg: `criecm.ldap_client`)
+if any share contains 'zfsrc',
+  criecm.zfs role will be called to create/configure zfs filesystem
 
 Role Variables
 --------------
@@ -18,6 +20,18 @@ read: `variable_name` (default value) details
 
 * `smb_join_user` () User needed to join domain
 * `smb_join_passwd` () ... and his password
+
+### shares
+* `shares` ([])
+  list of shares dict with:
+  * `name` ('') MANDATORY
+  name of share
+  * `cifs` (False) MANDATORY
+  share need this to be True to be defined
+  * `smbparams` ({})
+  dict of smb.conf additional parameters for the share
+  * `path` ('') MANDATORY
+  share's directory
 
 ## LDAP ((P)DC-only)
 ### Mandatory
