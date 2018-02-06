@@ -7,8 +7,6 @@ Install / configure samba standalone or in a NT4-style domain
 Requirements
 ------------
 ldap nss client installed (eg: `criecm.ldap_client`)
-if any share contains 'zfsrc',
-  criecm.zfs role will be called to create/configure zfs filesystem
 
 Role Variables
 --------------

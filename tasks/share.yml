@@ -11,6 +11,5 @@
     file:
       path: '{{ share.path }}'
       state: directory
-    when: '"zfsrc" not in share'
   when: not path_stat.stat.exists
 

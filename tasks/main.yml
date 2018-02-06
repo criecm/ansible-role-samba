@@ -42,12 +42,6 @@
   tags: samba, shares, config
   notify: reload samba
 
-- name: zfs
-  include_role:
-    name: criecm.zfs
-  when: shares | selectattr("zfsrc","defined") | list | count > 0
-  tags: zfs,shares
-
 - name: mkdir & co
   include_tasks: share.yml
   with_items:
