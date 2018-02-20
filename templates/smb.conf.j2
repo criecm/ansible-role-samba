@@ -25,7 +25,9 @@
   load printers = YES
   printing = {{ smb_printing }}
 {% else %}
+  printing = bsd
   load printers = NO
+  disable spoolss = yes
   printcap name = /dev/null
 {% endif %}
 
