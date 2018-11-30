@@ -1,7 +1,7 @@
 ---
 - name: install samba
   pkgng:
-    name: samba46
+    name: samba48
     state: present
   tags: samba, pkg
 
@@ -19,5 +19,4 @@
     regexp: '^winbindd_enable'
     state: present
   tags: samba, rc
-  when: is_dc
 
