@@ -69,3 +69,6 @@ smb_wins_server:
 shares: []
 # define shares for group
 group_shares: []
+
+# upgrade samba package
+upgrade: False

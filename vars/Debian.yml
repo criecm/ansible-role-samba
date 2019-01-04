@@ -3,4 +3,3 @@ smbconf_path: /etc/samba/smb.conf
 samba_reload_names: [ smbd, winbind ]
 samba_service_names: [ nmbd, smbd, winbind ]
 smbldap_conf_dir: /etc/smbldap-tools
-

@@ -7,6 +7,7 @@
 #  client ipc signing = auto
   workgroup = {{ smb_domain }}
   server string = {{ ansible_hostname }}
+  netbios name = {{ ansible_hostname }}
 {% if is_dc or smb_domain == "" %}
   security = user
 {% else %}
@@ -34,6 +35,10 @@
   aio read size = 16384
   aio write size = 16384
   use sendfile = Yes
+
+{% if ansible_os_family == "FreeBSD" %}
+  kernel change notify = no
+{% endif %}
 
   # Put a capping on the size of the log files (in Kb).
   max log size = 50

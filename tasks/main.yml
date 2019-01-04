@@ -9,25 +9,33 @@
     loop_var: includefile
   tags: samba, vars
 
+- name: check smbd
+  command: 'which smbd'
+  register: which_smbd
+  check_mode: False
+  changed_when: False
+  ignore_errors: True
+  tags: vars,samba
+
 - include_tasks: '{{ includefile }}'
   with_first_found:
     - files:
-        - '{{ ansible_os_family }}.yml'
+        - 'install-{{ ansible_os_family }}.yml'
       skip: True
   loop_control:
     loop_var: includefile
-  tags: samba, config
+  when: upgrade or ( which_smbd.rc > 0 )
+  tags: samba,install,config
 
-- name: smb.conf
-  template:
-    src: smb.conf.j2
-    dest: '{{ smbconf_path }}'
-    mode: '0640'
-    validate: 'testparm -s %s'
-    backup: yes
-  tags: samba, config
-  register: newconf
-  notify: reload samba
+- name: mkdir & co
+  include_tasks: share.yml
+  with_items:
+    - '{{ shares }}'
+    - '{{ group_shares }}'
+  loop_control:
+    loop_var: share
+  when: '"cifs" in share and share.cifs'
+  tags: samba,shares
 
 - name: mkdir smb.conf.d
   file:
@@ -42,15 +50,16 @@
   tags: samba, shares, config
   notify: reload samba
 
-- name: mkdir & co
-  include_tasks: share.yml
-  with_items:
-    - '{{ shares }}'
-    - '{{ group_shares }}'
-  loop_control:
-    loop_var: share
-  when: '"cifs" in share and share.cifs'
-  tags: samba,shares
+- name: smb.conf
+  template:
+    src: smb.conf.j2
+    dest: '{{ smbconf_path }}'
+    mode: '0640'
+    validate: 'testparm -s %s'
+    backup: yes
+  tags: samba, config
+  register: newconf
+  notify: reload samba
 
 - name: save ldap passwd
   shell: 'net idmap set secret {{ smb_domain }} {{ smb_ldap_readpw | default(smb_ldap_adminpw) }}'

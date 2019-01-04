@@ -15,7 +15,6 @@ read: `variable_name` (default value) details
 
 ## Mandatory
 * `smb_domain` () NT4 domain name
-
 * `smb_join_user` () User needed to join domain
 * `smb_join_passwd` () ... and his password
 
@@ -39,6 +38,7 @@ read: `variable_name` (default value) details
 * `smb_ldap_adminpw` ()
 
 ### optional
+* `upgrade (False)` do upgrade samba packages
 * `smb_global_params` ({}) dict of samba parameters
 ```
 smb_global_params:

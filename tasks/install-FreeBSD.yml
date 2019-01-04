@@ -1,4 +1,11 @@
 ---
+- name: stop samba
+  service:
+    name: samba_server
+    state: stopped
+  when: upgrade
+  tags: samba, pkg, upgrade
+
 - name: install samba
   pkgng:
     name: samba48
