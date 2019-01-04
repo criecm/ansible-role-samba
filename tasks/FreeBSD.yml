@@ -19,4 +19,5 @@
     regexp: '^winbindd_enable'
     state: present
   tags: samba, rc
+  when: not is_dc
 

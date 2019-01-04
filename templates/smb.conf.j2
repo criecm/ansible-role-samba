@@ -42,7 +42,7 @@
   idmap config *: range = 100000-200000
 
 {% if is_dc %}
-{% if smb_ldap_uri %}
+{%   if smb_ldap_uri %}
   ldap admin dn = {{ smb_ldap_readdn | default(smb_ldap_admindn) }}
   ldap group suffix = {{ smb_ldap_group_suffix }}
   ldap idmap suffix = {{ smb_ldap_suffix }}
@@ -63,14 +63,14 @@
 
   passdb backend = ldapsam:"{{ smb_ldap_uri }}"
 
-  {% if smb_ldapsam_trusted %}
+{%     if smb_ldapsam_trusted %}
   ldapsam:trusted=yes
-  {% if smb_ldapsam_editposix %}
+{%       if smb_ldapsam_editposix %}
   ldapsam:editposix=yes
-  {% endif %}
-  {% endif %}
+{%       endif %}
+{%     endif %}
 
-{% endif %}
+{%   endif %}
   domain logons = Yes
 {% else %}
   idmap config {{ ansible_hostname }}: backend = nss
@@ -97,7 +97,7 @@
 # You may want to add the following on a Linux system:
 #         SO_RCVBUF=8192 SO_SNDBUF=8192
 {% if ansible_system == "Linux" %}
-  socket options = TCP_NODELAY SO_RCVBUF=8192 SO_SNDBUF=8192
+#  socket options = TCP_NODELAY SO_RCVBUF=8192 SO_SNDBUF=8192
 {% else %}
   socket options = TCP_NODELAY
 {% endif %}
@@ -105,7 +105,7 @@
 # OS Level determines the precedence of this server in master browser
 # elections. The default value should be reasonable
 {% if smb_os_level %}
-  os level ={{ smb_os_level }}
+  os level = {{ smb_os_level }}
 {% endif %}
 
 # Windows Internet Name Serving Support Section:
@@ -121,20 +121,21 @@ lm announce = no
 
 # Charset settings
 #   display charset = utf8
-   unix charset = {{ smb_unix_charset }}
-   dos charset = {{ smb_dos_charset }}
+  unix charset = {{ smb_unix_charset }}
+  dos charset = {{ smb_dos_charset }}
 
+# from smb_global_params var
 {% for n,v in smb_global_params.iteritems() %}
-{{ n }} = {{ v }}
+  {{ n }} = {{ v }}
 {% endfor %}
 
-{% if smb_is_pdc %}
-# used to add unix machine account
-{% if smb_ldap_uri %}
+{% if smb_is_pdc and not smb_ldapsam_editposix %}
+# script used to add unix machine account
+{%   if smb_ldap_uri %}
   add machine script = /usr/local/sbin/smbldap-useradd -w "%u"
-{% else %}
+{%   else %}
   add machine script = /usr/sbin/adduser -n -g machines -c Machine -d /dev/null -s /bin/false %u
-{% endif %}
+{%   endif %}
 {% endif %}
 
 include = {{ smbconf_path }}.d/local.conf

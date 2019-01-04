@@ -1,13 +1,22 @@
 ---
 - name: install samba
   apt:
-    name: samba
+    name:
+      - samba
     state: present
   tags: samba,pkg
+
+- name: install winbind
+  apt:
+    name:
+      - winbind
+    state: present
+  tags: samba,pkg
+  when: not smb_is_pdc
 
 - name: installe smbldap-tools
   apt:
     name: smbldap-tools
     state: present
   tags: samba, pkg
-  when: smb_is_pdc == True
+  when: smb_is_pdc
