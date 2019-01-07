@@ -25,6 +25,9 @@
 {% if smb_printing %}
   load printers = YES
   printing = {{ smb_printing }}
+{%   if smb_printcap | default(False) %}
+  printcap name = {{ smb_printcap }}
+{%   endif %}
 {% else %}
   printing = bsd
   load printers = NO
