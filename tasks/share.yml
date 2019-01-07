@@ -7,9 +7,13 @@
 # create
 - block:
   # need mkdir
-  - name: mkdir
+  - name: mkdir/chown/chmod
     file:
       path: '{{ share.path }}'
       state: directory
-  when: not path_stat.stat.exists
+      owner: '{{ share.owner | default(omit) }}'
+      group: '{{ share.group | default(omit) }}'
+      mode: '{{ share.mode | default(omit) }}'
+      recurse: '{{ share.recurse | default(omit) }}'
+  when: reshare | default(False) or not path_stat.stat.exists
 
