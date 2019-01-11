@@ -1,9 +1,9 @@
 # {{ ansible_managed }}
 slaveLDAP="{{ smb_ldapr_uri | default(smb_ldap_uri) | regex_replace("ldaps?://","") | regex_replace("[:/].*$","") }}"
-slavePort="{% if smb_ldapr_uri | default(smb_ldap_uri) | regex_match(":[0-9]+") %}{{ smb_ldapr_uri | default(smb_ldap_uri) | regex_replace(":([0-9]+)","\\1") }}{% else %}{% if smb_ldapr_uri | default(smb_ldap_uri) | regex_match("^ldaps:","") %}636{% else %}389{% endif %}{% endif %}"
+slavePort="{% if smb_ldapr_uri | default(smb_ldap_uri) is search(":[0-9]+") %}{{ smb_ldapr_uri | default(smb_ldap_uri) | regex_replace(":([0-9]+)","\\1") }}{% else %}{% if smb_ldapr_uri | default(smb_ldap_uri) is search("^ldaps:","") %}636{% else %}389{% endif %}{% endif %}"
 
 masterLDAP="{{ smb_ldap_uri | regex_replace("ldaps?://","") | regex_replace("[:/].*$","") }}"
-masterPort="{% if smb_ldap_uri | regex_match(":[0-9]+") %}{{ smb_ldap_uri | regex_replace(":([0-9]+)","\\1") }}{% else %}{% if smb_ldap_uri | regex_match("^ldaps:","") %}636{% else %}389{% endif %}{% endif %}"
+masterPort="{% if smb_ldap_uri is search(":[0-9]+") %}{{ smb_ldap_uri | regex_replace(":([0-9]+)","\\1") }}{% else %}{% if smb_ldap_uri is search("^ldaps:","") %}636{% else %}389{% endif %}{% endif %}"
 
 ldapTLS="{{ smb_ldap_tls | default("0") }}"
 
@@ -35,9 +35,9 @@ sambaUnixIdPooldn="sambaDomainName={{ smb_domain }},{{ smb_ldap_suffix }}"
 scope="{% if smb_ldap_scope | default(False) %}{{ smb_ldap_scope }}{% else %}sub{% endif %}"
 
 # Unix password encryption (CRYPT, MD5, SMD5, SSHA, SHA, CLEARTEXT)
-hash_encrypt="{% if smb_ldap_pwdhash %}{{ smb_ldap_pwdhash }}{% else %}SSHA{% endif %}"
+hash_encrypt="{% if smb_ldap_pwdhash | default(False) %}{{ smb_ldap_pwdhash }}{% else %}SSHA{% endif %}"
 
-{% if smb_ldap_salt_format %}
+{% if smb_ldap_pwdhash | default("SSHA") is match("CRYPT") and smb_ldap_salt_format | default(False) %}
 crypt_salt_format="{{ smb_ldap_salt_format }}"
 {% endif %}
 

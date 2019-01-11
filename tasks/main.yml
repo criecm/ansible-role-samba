@@ -61,9 +61,9 @@
   register: newconf
   notify: reload samba
 
-- name: save ldap passwd
+- name: save ldap passwd (IDMAP)
   shell: 'net idmap set secret {{ smb_domain }} {{ smb_ldap_readpw | default(smb_ldap_adminpw) }}'
-  when: newconf.changed and smb_domain != "" and ( smb_ldap_adminpw != "" or smb_ldap_readpw != "" ) and is_dc
+  when: newconf.changed and smb_domain != "" and ( smb_ldap_adminpw != "" or smb_ldap_readpw != "" ) and is_dc and not smb_is_pdc
   tags: samba, config
 
 - name: save ldap adminpw

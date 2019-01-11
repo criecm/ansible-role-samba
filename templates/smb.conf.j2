@@ -58,14 +58,16 @@
   ldap passwd sync = {{ smb_ldap_passwd_sync }}
   ldap suffix = {{ smb_ldap_suffix }}
   ldap user suffix = {{ smb_ldap_user_suffix }}
-  ldap ssl = No
+  ldap ssl = {% if smb_ldap_uri is search("^ldaps:") %}Yes{% else %}No{% endif %}
 
+{%     if not smb_is_pdc %}
   idmap config {{ smb_domain }}: backend = LDAP
   idmap config {{ smb_domain }}: read only = yes
   idmap config {{ smb_domain }}: ldap_user_dn = {{ smb_ldap_readdn | default(smb_ldap_admindn) }}
   idmap config {{ smb_domain }}: ldap_base_dn = {{ smb_ldap_suffix }}
   idmap config {{ smb_domain }}: ldap_url = {{ smb_ldapr_uri | default(smb_ldap_uri) }}
   idmap config {{ smb_domain }}: range = 10000-99999
+{%     endif %}
 
   passdb expand explicit = no
 
