@@ -1,6 +1,6 @@
 # {{ ansible_managed }}
-slaveLDAP="{{ smb_ldapr_uri | default(smb_ldap_uri) | regex_replace("ldaps?://","") | regex_replace("[:/].*$","") }}"
-slavePort="{% if smb_ldapr_uri | default(smb_ldap_uri) is search(":[0-9]+") %}{{ smb_ldapr_uri | default(smb_ldap_uri) | regex_replace(":([0-9]+)","\\1") }}{% else %}{% if smb_ldapr_uri | default(smb_ldap_uri) is search("^ldaps:","") %}636{% else %}389{% endif %}{% endif %}"
+slaveLDAP="{{ smb_ldap_uri | regex_replace("ldaps?://","") | regex_replace("[:/].*$","") }}"
+slavePort="{% if smb_ldap_uri is search(":[0-9]+") %}{{ smb_ldap_uri | regex_replace(":([0-9]+)","\\1") }}{% else %}{% if smb_ldap_uri is search("^ldaps:","") %}636{% else %}389{% endif %}{% endif %}"
 
 masterLDAP="{{ smb_ldap_uri | regex_replace("ldaps?://","") | regex_replace("[:/].*$","") }}"
 masterPort="{% if smb_ldap_uri is search(":[0-9]+") %}{{ smb_ldap_uri | regex_replace(":([0-9]+)","\\1") }}{% else %}{% if smb_ldap_uri is search("^ldaps:","") %}636{% else %}389{% endif %}{% endif %}"
