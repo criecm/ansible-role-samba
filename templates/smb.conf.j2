@@ -135,7 +135,7 @@ lm announce = no
   dos charset = {{ smb_dos_charset }}
 
 # from smb_global_params var
-{% for n,v in smb_global_params.iteritems() %}
+{% for n,v in smb_global_params.items() %}
   {{ n }} = {{ v }}
 {% endfor %}
 

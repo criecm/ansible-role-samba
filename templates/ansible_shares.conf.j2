@@ -4,7 +4,7 @@
 {% if "cifs" in share and share.cifs %}
 [{{ share.name }}]
   path = {{ share.path }}
-{%   for e,v in share.smbparms.iteritems() %}
+{%   for e,v in share.smbparms.items() %}
   {{ e }} = {{ v }}
 {%   endfor %}
 
