@@ -27,4 +27,3 @@
     state: present
   tags: samba, rc
   when: not is_dc
-

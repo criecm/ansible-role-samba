@@ -69,7 +69,7 @@
   tags: samba, config
 
 - name: save ldap adminpw
-  shell: 'smbpasswd -w {{ smb_ldap_adminpw }}'
+  command: 'smbpasswd -w {{ smb_ldap_adminpw }}'
   when: is_dc and newconf.changed and smb_ldap_adminpw | length > 0
   tags: samba, config
 

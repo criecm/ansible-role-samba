@@ -16,4 +16,3 @@
       mode: '{{ share.mode | default(omit) }}'
       recurse: '{{ share.recurse | default(omit) }}'
   when: reshare | default(False) or not path_stat.stat.exists
-
