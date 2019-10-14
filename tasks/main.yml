@@ -1,6 +1,7 @@
 ---
 # tasks file for criecm.samba
-- include_vars: '{{ includefile }}'
+- name: OS vars
+  include_vars: '{{ includefile }}'
   with_first_found:
     - files:
         - '{{ ansible_os_family }}.yml'
@@ -17,7 +18,8 @@
   ignore_errors: True
   tags: vars,samba
 
-- include_tasks: '{{ includefile }}'
+- name: OS tasks
+  include_tasks: '{{ includefile }}'
   with_first_found:
     - files:
         - 'install-{{ ansible_os_family }}.yml'
@@ -62,32 +64,33 @@
   notify: reload samba
 
 - name: save ldap passwd (IDMAP)
-  shell: 'net idmap set secret {{ smb_domain }} {{ smb_ldap_readpw | default(smb_ldap_adminpw) }}'
-  when: newconf.changed and smb_domain != "" and ( smb_ldap_adminpw != "" or smb_ldap_readpw != "" ) and is_dc and not smb_is_pdc
+  command: 'net idmap set secret {{ smb_domain }} {{ smb_ldap_readpw | default(smb_ldap_adminpw) }}'
+  when: newconf.changed and smb_domain | length > 0 and ( smb_ldap_adminpw | length > 0 or smb_ldap_readpw | length > 0 ) and is_dc and not smb_is_pdc
   tags: samba, config
 
 - name: save ldap adminpw
   shell: 'smbpasswd -w {{ smb_ldap_adminpw }}'
-  when: is_dc and newconf.changed and smb_ldap_adminpw != ""
+  when: is_dc and newconf.changed and smb_ldap_adminpw | length > 0
   tags: samba, config
 
-- block:
-  - name: config smbldap-tools
-    template:
-      src: smbldap.conf.j2
-      dest: '{{ smbldap_conf_dir }}/smbldap.conf'
-    tags: samba, smbldap
-  - name: privconf smbldap-tools
-    template:
-      src: smbldap_bind.conf.j2
-      dest: '{{ smbldap_conf_dir }}/smbldap_bind.conf'
-      mode: '0600'
-    tags: samba, smbldap
-  when: smb_is_pdc == True
-    
+- name: smbldap-tools if pdc
+  block:
+    - name: config smbldap-tools
+      template:
+        src: smbldap.conf.j2
+        dest: '{{ smbldap_conf_dir }}/smbldap.conf'
+      tags: samba, smbldap
+    - name: privconf smbldap-tools
+      template:
+        src: smbldap_bind.conf.j2
+        dest: '{{ smbldap_conf_dir }}/smbldap_bind.conf'
+        mode: '0600'
+      tags: samba, smbldap
+  when: smb_is_pdc | bool
+
 - name: join domain
   command: 'net rpc join -U {{ samba_join_user }}%{{ samba_join_passwd }}'
-  when: samba_join_user != "" and newconf.changed
+  when: samba_join_user | length > 0 and newconf.changed
   tags: samba, config
 
 - name: enable services
